@@ -1,5 +1,9 @@
 # Anti-Debug Tricks
 
+### Site
+
+Compiled encyclopedia resides here: https://anti-debug.checkpoint.com.
+
 ### Description
 
 Debugging is the essential part of malware analysis. Every time we need to drill down into malware behavior, restore encryption methods or examine communication protocols – generally, whenever we need to examine memory at a certain moment of time – we use debuggers.
@@ -13,7 +17,7 @@ Anti-Debug tricks are grouped by the way in which they trigger side-effects (“
 All the techniques which are described in this encyclopedia are implemented in our [ShowStopper][showstopper_link] open-source project. The encyclopedia can help you to better understand how these techniques work or to assess debuggers and anti-anti-debug plugins.
 
 <p align="right">
-    Yaraslau Harakhavik,<br />
+    Yaraslau Harakhavik ([@slevin_by][slevin_by]),<br />
     <i>Reverse Engineer at Check Point Research</i>
 </p>
 <br />
@@ -25,9 +29,10 @@ All the techniques which are described in this encyclopedia are implemented in o
 * [Anti Debugging Protection Techniques with Examples][apriorit]
 * [simpliFiRE.AntiRE][simplifire]
 
-[ferrie]: <http://pferrie.host22.com/papers/antidebug.pdf>
+[slevin_by]: <https://twitter.com/slevin_by>
+[ferrie]: <http://pferrie.epizy.com/papers/antidebug.pdf>
 [falliere]: <https://www.symantec.com/connect/articles/windows-anti-debug-reference>
-[jackson]: <https://tuts4you.com/download/2516/>
+[jackson]: <https://forum.tuts4you.com/files/file/1218-anti-reverse-engineering-guide/>
 [apriorit]: <https://www.apriorit.com/dev-blog/367-anti-reverse-engineering-protection-techniques-to-use-before-releasing-software>
 [simplifire]: <https://bitbucket.org/fkie_cd_dare/simplifire.antire/src/master/>
 

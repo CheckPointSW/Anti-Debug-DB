@@ -15,16 +15,16 @@ Anti-Debug tricks are grouped by the way in which they trigger side-effects (“
 All the techniques which are described in this encyclopedia are implemented in our <a href="https://github.com/CheckPointSW/showstopper">ShowStopper</a> open-source project. The encyclopedia can help you to better understand how these techniques work or to assess debuggers and anti-anti-debug plugins.
 
 <p align="right">
-    Yaraslau Harakhavik,<br />
+    Yaraslau Harakhavik (<i class="fa fa-twitter fa-lg" style="color:#1DA1F2"></i> <a href="https://twitter.com/slevin_by">@slevin_by</a>),<br />
     <i>Reverse Engineer at Check Point Research</i>
 </div>
 <br />
 
 <h2>References</h2>
 <ul>
-<li><a href="http://pferrie.host22.com/papers/antidebug.pdf">P. Ferrie. The “Ultimate”Anti-Debugging Reference</a></li>
+<li><a href="http://pferrie.epizy.com/papers/antidebug.pdf">P. Ferrie. The “Ultimate”Anti-Debugging Reference</a></li>
 <li><a href="https://www.symantec.com/connect/articles/windows-anti-debug-reference">N. Falliere. Windows Anti-Debug Reference</a></li>
-<li><a href="https://tuts4you.com/download/2516/">J. Jackson. An Anti-Reverse Engineering Guide</a></li>
+<li><a href="https://forum.tuts4you.com/files/file/1218-anti-reverse-engineering-guide/">J. Jackson. An Anti-Reverse Engineering Guide</a></li>
 <li><a href="https://www.apriorit.com/dev-blog/367-anti-reverse-engineering-protection-techniques-to-use-before-releasing-software">Anti Debugging Protection Techniques with Examples</a></li>
 <li><a href="https://bitbucket.org/fkie_cd_dare/simplifire.antire/src/master/">simpliFiRE.AntiRE</a></li>
 </ul>
