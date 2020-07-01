@@ -6,7 +6,7 @@ permalink: /about/
 
 Debugging is the essential part of malware analysis. Every time we need to drill down into malware behavior, restore encryption methods or examine communication protocols – generally, whenever we need to examine memory at a certain moment of time – we use debuggers.
 
-Debuggers interfere with the debugged process in a way that usually produces side-effects. These side-effects are often used by malicious programs to verify if it is executed under debugging. In turn knowledge of anti-debug techniques helps us detect when the malware tries to prevent us from debugging it and mitigate the interference.
+Debuggers interfere with the debugged process in a way that usually produces side-effects. These side-effects are often used by malicious programs to verify if they are executed under debugging. In turn knowledge of anti-debug techniques helps us detect when the malware tries to prevent us from debugging it and mitigate the interference.
 
 This encyclopedia contains the description of anti-debug tricks which work on the latest Windows releases with the most popular debuggers (such as OllyDbg, WinDbg, x64dbg). Deprecated techniques (e.g. for SoftICE, etc.) are not included (despite all the love to SoftICE).
 

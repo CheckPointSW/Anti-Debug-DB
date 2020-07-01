@@ -2,20 +2,20 @@
 
 ### Description
 
-Debugging is the essential part of malware analysis. Every time when we need to go deep down to malware behavior, restore encryption methods or examine communication protocols – generally, all the time we need to examine memory in a certain moment of time – we use debuggers.
+Debugging is the essential part of malware analysis. Every time we need to drill down into malware behavior, restore encryption methods or examine communication protocols – generally, whenever we need to examine memory at a certain moment of time – we use debuggers.
 
-Debuggers interfere with the debugging process such a way that usually produces side-effects. These side-effects often checked by malicious programs to verify if it is executed under debugging. Knowledge of anti-debug techniques helps us to detect when the malware tries to prevent us debugging it and mitigate the interference in due course.
+Debuggers interfere with the debugged process in a way that usually produces side-effects. These side-effects are often used by malicious programs to verify if they are executed under debugging. In turn knowledge of anti-debug techniques helps us detect when the malware tries to prevent us from debugging it and mitigate the interference.
 
-The encyclopedia contains the description of anti-debug tricks which work on latest Windows releases with the most popular debuggers (such as OllyDbg, WinDbg, x64dbg). Deprecated techniques (e.g. for SoftICE, etc.) are not included in our encyclopedia (despite all the love to SoftICE).
+This encyclopedia contains the description of anti-debug tricks which work on the latest Windows releases with the most popular debuggers (such as OllyDbg, WinDbg, x64dbg). Deprecated techniques (e.g. for SoftICE, etc.) are not included (despite all the love to SoftICE).
 
-Anti-Debug tricks grouped d by the way which triggers side-effects (“meh, yet another classification”, you might think). Each group includes the description of corresponding tricks, their implementation in C/C++ or x86/x86-64 Assembly language and recommendations how to mitigate the described trick for developers who want to create anti-anti-debug solution. But, in general, for bypassing anti-debug techniques we recommend using [ScyllaHide][scylla_link] plugin which supports OllyDbg, x64dbg and IDA Pro.
+Anti-Debug tricks are grouped by the way in which they trigger side-effects (“meh, yet another classification”, you might think). Each group includes the description of corresponding tricks, their implementation in C/C++ or x86/x86-64 Assembly language, and recommendations of how to mitigate the trick for developers who want to create their own anti-anti-debug solution. In general, for bypassing anti-debug techniques we recommend using the [ScyllaHide][scylla_link] plugin which supports OllyDbg, x64dbg and IDA Pro.
 
-All the techniques which are described in this encyclopedia are implemented in our [ShowStopper][showstopper_link] open-source project. It can help you to better understand how these techniques work or to assess the debuggers and anti-anti-debug plugins.
+All the techniques which are described in this encyclopedia are implemented in our [ShowStopper][showstopper_link] open-source project. The encyclopedia can help you to better understand how these techniques work or to assess debuggers and anti-anti-debug plugins.
 
-<div style="text-align: right">
+<p align="right">
     Yaraslau Harakhavik,<br />
     <i>Reverse Engineer at Check Point Research</i>
-</div>
+</p>
 <br />
 
 ## References
