@@ -17,7 +17,7 @@ Anti-Debug tricks are grouped by the way in which they trigger side-effects (“
 All the techniques which are described in this encyclopedia are implemented in our [ShowStopper][showstopper_link] open-source project. The encyclopedia can help you to better understand how these techniques work or to assess debuggers and anti-anti-debug plugins.
 
 <p align="right">
-    Yaraslau Harakhavik ([@slevin_by][slevin_by]),<br />
+    Yaraslau Harakhavik (<a href="https://twitter.com/slevin_by">@slevin_by</a>),<br />
     <i>Reverse Engineer at Check Point Research</i>
 </p>
 <br />
@@ -29,7 +29,6 @@ All the techniques which are described in this encyclopedia are implemented in o
 * [Anti Debugging Protection Techniques with Examples][apriorit]
 * [simpliFiRE.AntiRE][simplifire]
 
-[slevin_by]: <https://twitter.com/slevin_by>
 [ferrie]: <http://pferrie.epizy.com/papers/antidebug.pdf>
 [falliere]: <https://www.symantec.com/connect/articles/windows-anti-debug-reference>
 [jackson]: <https://forum.tuts4you.com/files/file/1218-anti-reverse-engineering-guide/>
