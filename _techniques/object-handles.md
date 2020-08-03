@@ -265,4 +265,4 @@ If you write an anti-anti-debug solution, you need to hook the listed functions 
 The following techniques should be handled without hooks:
 
 * <tt>ntdll!NtCreateFile</tt>: Too generic to mitigate. However, if you write a plugin for a specific debugger, you can ensure that the handle of the debugged file is closed.
-* <tt>kernel32!LoadLibraryW/A</tt>: No mitgation.
+* <tt>kernel32!LoadLibraryW/A</tt>: No mitigation.

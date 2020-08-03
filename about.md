@@ -17,7 +17,7 @@ All the techniques which are described in this encyclopedia are implemented in o
 <p align="right">
     Yaraslau Harakhavik (<i class="fa fa-twitter fa-lg" style="color:#1DA1F2"></i> <a href="https://twitter.com/slevin_by">@slevin_by</a>),<br />
     <i>Reverse Engineer at Check Point Research</i>
-</div>
+</p>
 <br />
 
 <h2>References</h2>
