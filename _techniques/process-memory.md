@@ -502,13 +502,13 @@ bool IsDebuggerPresent()
 
 <br />
 <h4><a class="a-dummy" name="patch_ntdll_dbgbreakpoint">2.3. Patch ntdll!DbgBreakPoint()</a></h4>
-The function <tt>ntdll!DbgBreakPrint()</tt> has the following implementation:
+The function <tt>ntdll!DbgBreakPoint()</tt> has the following implementation:
 
 <div style="text-align: center">
   <img src="{{site.baseurl}}/assets/images/dbgbreakpoint.png">
 </div>
 
-<br />It is called when a debugger attaches to a running process. It allows the debugger to gain control because an exception is raised which it can intercept. If we erase the breakpoint inside <tt>ntdll!DbgBreakPrint()</tt>, the debugger won't break in and the thread will exit.
+<br />It is called when a debugger attaches to a running process. It allows the debugger to gain control because an exception is raised which it can intercept. If we erase the breakpoint inside <tt>ntdll!DbgBreakPoint()</tt>, the debugger won't break in and the thread will exit.
 
 <hr class="space">
 
