@@ -26,6 +26,7 @@ tags: debug-flags
     * [2.2. NtGlobalFlag](#manual-checks-ntglobalflag)
     * [2.3. Heap Flags](#manual-checks-heap-flags)
     * [2.4. Heap Protection](#manual-checks-heap-protection)
+    * [2.5. Check KUSER_SHARED_DATA structure](#kuser_shared_data)
     * [Mitigations](#mitigations-manual-checks)
 <br />
 
@@ -711,7 +712,7 @@ bool Check()
 {% endhighlight %}
 
 <br />
-<h4><a class="a-dummy" name="manual-checks-heap-protection">2.3. Heap Protection</a></h4>
+<h4><a class="a-dummy" name="manual-checks-heap-protection">2.4. Heap Protection</a></h4>
 If the <tt>HEAP_TAIL_CHECKING_ENABLED</tt> flag is set in <tt>NtGlobalFlag</tt>, the sequence <tt>0xABABABAB</tt> will be appended (twice in 32-Bit and 4 times in 64-Bit Windows) at the end of the allocated heap block.
 
 If the <tt>HEAP_FREE_CHECKING_ENABLED</tt> flag is set in <tt>NtGlobalFlag</tt>, the sequence <tt>0xFEEEFEEE</tt> will be appended if additional bytes are required to fill in the empty space until the next memory block.
@@ -734,6 +735,35 @@ bool Check()
 
     PVOID pOverlapped = (PBYTE)HeapEntry.lpData + HeapEntry.cbData;
     return ((DWORD)(*(PDWORD)pOverlapped) == 0xABABABAB);
+}
+
+{% endhighlight %}
+
+<br />
+<h4><a class="a-dummy" name="kuser_shared_data">2.5. Check KUSER_SHARED_DATA structure</a></h4>
+This technique was originally described as an <a href="https://github.com/mrexodia/TitanHide/issues/18">issue for TitanHide</a>, a kernel driver to hide debuggers from detection. The detailed documentation for the structure <tt>KUSER_SHARED_DATA</tt> and its fields is available  <a href="https://www.geoffchappell.com/studies/windows/km/ntoskrnl/inc/api/ntexapi_x/kuser_shared_data/index.htm">here</a>.
+
+Here is what the author of the issue wrote in the post regarding the features of the structure and its appropriate field:
+<i>"0x7ffe02d4 is actually 0x7ffe0000 + 0x2d4. 0x7ffe0000 is the fixed user mode address of the KUSER_SHARED_DATA structure that contains data that is shared between user mode and the kernel (though user mode doesn't have write access to it). The struct has some interesting properties:</i>
+<li><i>its address is fixed and has been in all Windows versions since it was introduced</i></li>
+<li><i>its user mode address is the same in 32 bit and 64 bit mode</i></li>
+<li><i>all offsets and sizes are strictly fixed, and new fields are only ever appended or added in place of unused padding space</i></li>
+
+<br>
+<i>Hence this program will work in 32 bit Windows 2000 and 64 bit Windows 10 without recompiling".
+</i>
+
+<hr class="space">
+
+<b>C/C++ Code</b>
+<p></p>
+
+{% highlight c %}
+
+bool check_kuser_shared_data_structure()
+{
+    unsigned char b = *(unsigned char*)0x7ffe02d4;
+    return ((b & 0x01) || (b & 0x02));
 }
 
 {% endhighlight %}
@@ -835,3 +865,8 @@ for (SIZE_T offset = 0; offset < nDwordsToPatch; offset++)
     *((PDWORD)pHeapEnd + offset) = 0;
 
 {% endhighlight %}
+
+<br />
+<b>For KUSER_SHARED_DATA:</b>
+<p></p>
+For a possible mitigation, please check the link when the technique is described (with the issue for TitanHide) and also a draft code for patching <tt>kdcom.dll</tt> <a href="https://gist.github.com/anonymous/b5024c25634fc36e699cd9d041224531">here</a>.

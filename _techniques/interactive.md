@@ -390,7 +390,7 @@ The idea is simple. If a debugger is not present and <tt>kernel32!OutputDebugStr
 
 <hr class="space">
 
-<b>C/C++ Code</b>
+<b>C/C++ Code (variant1)</b>
 <p></p>
 
 {% highlight c %}
@@ -401,8 +401,28 @@ bool IsDebugged()
         return false;
 
     DWORD dwLastError = GetLastError();
-    OutputDebugString(L"AntiDebug_OutputDebugString");
+    OutputDebugString(L"AntiDebug_OutputDebugString_v1");
     return GetLastError() != dwLastError;
+}
+
+{% endhighlight %}
+
+<hr class="space">
+
+<b>C/C++ Code (variant2)</b>
+<p></p>
+
+{% highlight c %}
+
+bool IsDebugged()
+{
+    if (IsWindowsVistaOrGreater())
+        return false;
+
+    DWORD dwErrVal = 0x666; 
+    SetLastError(dwErrVal);
+    OutputDebugString(L"AntiDebug_OutputDebugString_v2");
+    return GetLastError() != dwErrVal;
 }
 
 {% endhighlight %}
@@ -427,4 +447,3 @@ If you write an anti-anti-debug solution, all the following functions can be hoo
 * <tt>kernel32!OutputDebugStringW</tt>
 
 Hooked functions can check input arguments and modify the original function behavior.
-

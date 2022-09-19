@@ -18,6 +18,7 @@ tags: misc
 * [4. DbgPrint()](#dbgprint)
 * [5. DbgSetDebugFilterState()](#dbgsetdebugfilterstate)
 * [6. NtYieldExecution() / SwitchToThread()](#switchtothread)
+* [7. VirtualAlloc() / GetWriteWatch()](#getwritewatch)
 * [Mitigations](#mitigations)
 <br />
 
@@ -44,12 +45,16 @@ The following functions can be used:
 {% highlight c %}
 
 const std::vector<std::string> vWindowClasses = {
-    "OLLYDBG",
-    "WinDbgFrameClass", // WinDbg
+    "antidbg",
     "ID",               // Immunity Debugger
-    "Zeta Debugger",
-    "Rock Debugger",
+    "ntdll.dll",        // peculiar name for a window class
     "ObsidianGUI",
+    "OLLYDBG",
+    "Rock Debugger",
+    "SunAwtFrame",
+    "Qt5QWindowIcon"
+    "WinDbgFrameClass", // WinDbg
+    "Zeta Debugger",
 };
 
 bool IsDebugged()
@@ -364,6 +369,124 @@ bool IsDebugged()
 <hr class="space">
 
 <br />
+<h3><a class="a-dummy" name="getwritewatch">7. VirtualAlloc() / GetWriteWatch()</a></h3>
+This technique was described as a <a href="https://codeinsecurity.wordpress.com/2018/01/24/anti-debug-with-virtualallocs-write-watch/">suggestion</a> for a famous al-khaser solution, a tool for testing VMs, debuggers, sandboxes, AV, etc. against many malware-like defences.
+
+The idea is drawn from the <a href="https://docs.microsoft.com/en-us/windows/win32/api/memoryapi/nf-memoryapi-getwritewatch">documentation</a>  for <tt>GetWriteWatch</tt> function where the following is stated in a "Remarks" section:
+
+<i>"When you call the <b>VirtualAlloc</b>  function to reserve or commit memory, you can specify <b>MEM_WRITE_WATCH</b>. This value causes the system to keep track of the pages that are written to in the committed memory region. You can call the <b>GetWriteWatch</b> function to retrieve the addresses of the pages that have been written to since the region has been allocated or the write-tracking state has been reset".</i>
+
+This feature can be used to track debuggers that may modify memory pages outside the expected pattern.
+
+<hr class="space">
+
+<b>C/C++ Code (variant 1)</b>
+<p></p>
+
+{% highlight c %}
+
+bool Generic::CheckWrittenPages1() const {
+    const int SIZE_TO_CHECK = 4096;
+
+    PVOID* addresses = static_cast<PVOID*>(VirtualAlloc(NULL, SIZE_TO_CHECK * sizeof(PVOID), MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE));
+    if (addresses == NULL)
+    {
+        return true;
+    }
+
+    int* buffer = static_cast<int*>(VirtualAlloc(NULL, SIZE_TO_CHECK * SIZE_TO_CHECK, MEM_RESERVE | MEM_COMMIT | MEM_WRITE_WATCH, PAGE_READWRITE));
+    if (buffer == NULL)
+    {
+        VirtualFree(addresses, 0, MEM_RELEASE);
+        return true;
+    }
+
+    // Read the buffer once
+    buffer[0] = 1234;
+
+    ULONG_PTR hits = SIZE_TO_CHECK;
+    DWORD granularity;
+    if (GetWriteWatch(0, buffer, SIZE_TO_CHECK, addresses, &hits, &granularity) != 0)
+    {
+        return true;
+    }
+    else
+    {
+        VirtualFree(addresses, 0, MEM_RELEASE);
+        VirtualFree(buffer, 0, MEM_RELEASE);
+
+        return (hits == 1) ? false : true;
+    }
+}
+
+{% endhighlight %}
+
+<hr class="space">
+
+<b>C/C++ Code (variant 2)</b>
+<p></p>
+
+{% highlight c %}
+
+bool Generic::CheckWrittenPages2() const {
+    BOOL result = FALSE, error = FALSE;
+
+    const int SIZE_TO_CHECK = 4096;
+
+    PVOID* addresses = static_cast<PVOID*>(VirtualAlloc(NULL, SIZE_TO_CHECK * sizeof(PVOID), MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE));
+    if (addresses == NULL)
+    {
+        return true;
+    }
+
+    int* buffer = static_cast<int*>(VirtualAlloc(NULL, SIZE_TO_CHECK * SIZE_TO_CHECK, MEM_RESERVE | MEM_COMMIT | MEM_WRITE_WATCH, PAGE_READWRITE));
+    if (buffer == NULL)
+    {
+        VirtualFree(addresses, 0, MEM_RELEASE);
+        return true;
+    }
+
+    // Make some calls where a buffer *can* be written to, but isn't actually edited because we pass invalid parameters    
+    if (GlobalGetAtomName(INVALID_ATOM, (LPTSTR)buffer, 1) != FALSE
+        || GetEnvironmentVariable("This variable does not exist", (LPSTR)buffer, 4096 * 4096) != FALSE
+        || GetBinaryType("This name does not exist", (LPDWORD)buffer) != FALSE
+        || HeapQueryInformation(0, (HEAP_INFORMATION_CLASS)69, buffer, 4096, NULL) != FALSE
+        || ReadProcessMemory(INVALID_HANDLE_VALUE, (LPCVOID)0x69696969, buffer, 4096, NULL) != FALSE
+        || GetThreadContext(INVALID_HANDLE_VALUE, (LPCONTEXT)buffer) != FALSE
+        || GetWriteWatch(0, &result, 0, NULL, NULL, (PULONG)buffer) == 0)
+    {
+        result = false;
+        error = true;
+    }
+
+    if (error == FALSE)
+    {
+        // A this point all calls failed as they're supposed to
+        ULONG_PTR hits = SIZE_TO_CHECK;
+        DWORD granularity;
+        if (GetWriteWatch(0, buffer, SIZE_TO_CHECK, addresses, &hits, &granularity) != 0)
+        {
+            result = FALSE;
+        }
+        else
+        {
+            // Should have zero reads here because GlobalGetAtomName doesn't probe the buffer until other checks have succeeded
+            // If there's an API hook or debugger in here it'll probably try to probe the buffer, which will be caught here
+            result = hits != 0;
+        }
+    }
+
+    VirtualFree(addresses, 0, MEM_RELEASE);
+    VirtualFree(buffer, 0, MEM_RELEASE);
+
+    return result;
+}
+
+{% endhighlight %}
+
+<hr class="space">
+
+<br />
 <h3><a class="a-dummy" name="mitigations">Mitigations</a></h3>
 During debugging: Fill anti-debug pr anti-traced checks with <tt>NOP</tt>s.
 
@@ -385,3 +508,5 @@ During debugging: Fill anti-debug pr anti-traced checks with <tt>NOP</tt>s.
 5. For <tt>DbgSetDebugFilterState()</tt>: Hook <tt>ntdll!NtSetDebugFilterState()</tt>. If the process is running with debug privileges, return unsuccessfully from the hook.
 
 6. For <tt>SwitchToThread</tt>: Hook <tt>ntdll!NtYieldExecution()</tt> and return an unsuccessful status from the hook.
+
+7. For <tt>GetWriteWatch</tt>: Hook <tt>VirtualAlloc()</tt> and <tt>GetWriteWatch()</tt> to track if <tt>VirtualAlloc()</tt> is called with <tt>MEM_WRITE_WATCH</tt> flag. If it is the case, check what is the region to track and return the expected value in <tt>GetWriteWatch()</tt>.
