@@ -12,11 +12,12 @@ tags: assembly
 
 * [1. INT 3](#int3)
 * [2. INT 2D](#int2d)
-* [3. ICE](#ice)
-* [4. Stack Segment Register](#ss_register)
-* [5. Instruction Counting](#instruction-counting)
-* [6. POPF and Trap Flag](#popf_and_trap_flag)
-* [7. Instruction Prefixes](#instruction_prefixes)
+* [3. DebugBreak](#debugbreak)
+* [4. ICE](#ice)
+* [5. Stack Segment Register](#ss_register)
+* [6. Instruction Counting](#instruction-counting)
+* [7. POPF and Trap Flag](#popf_and_trap_flag)
+* [8. Instruction Prefixes](#instruction_prefixes)
 * [Mitigations](#mitigations)
 <br />
 
@@ -123,7 +124,38 @@ bool IsDebugged()
 <hr class="space">
 
 <br />
-<h3><a class="a-dummy" name="ice">3. ICE</a></h3>
+<h3><a class="a-dummy" name="debugbreak">3. DebugBreak</a></h3>
+As written in <a href="https://docs.microsoft.com/en-us/windows/win32/api/debugapi/nf-debugapi-debugbreak">DebugBreak documentation</a>, "<tt>DebugBreak</tt> causes a breakpoint exception to occur in the current process. This allows the calling thread to signal the debugger to handle the exception".
+
+If the program is executed without a debugger, the control will be passed to the exception handler. Otherwise, the execution will be intercepted by the debugger.
+
+<hr class="space">
+
+<b>C/C++ Code</b>
+<p></p>
+
+{% highlight c %}
+
+bool IsDebugged()
+{
+    __try
+    {
+        DebugBreak();
+    }
+    __except(EXCEPTION_BREAKPOINT)
+    {
+        return false;
+    }
+    
+    return true;
+}
+
+{% endhighlight %}
+
+<hr class="space">
+
+<br />
+<h3><a class="a-dummy" name="ice">4. ICE</a></h3>
 "<tt>ICE</tt>" is one of Intel's undocumented instructions. Its opcode is <tt>0xF1</tt>. It can be used to detect if the program is traced.
 
 If <tt>ICE</tt> instruction is executed, the <tt>EXCEPTION_SINGLE_STEP</tt> (<tt>0x80000004</tt>) exception will be raised.
@@ -155,7 +187,7 @@ bool IsDebugged()
 <hr class="space">
 
 <br />
-<h3><a class="a-dummy" name="ss_register">4. Stack Segment Register</a></h3>
+<h3><a class="a-dummy" name="ss_register">5. Stack Segment Register</a></h3>
 This is a trick that can be used to detect if the program is being traced.
 The trick consists of tracing over the following sequence of assembly instructions:
 {% highlight asm %}
@@ -200,7 +232,7 @@ movss_not_being_debugged:
 <hr class="space">
 
 <br />
-<h3><a class="a-dummy" name="instruction-counting">5. Instruction Counting</a></h3>
+<h3><a class="a-dummy" name="instruction-counting">6. Instruction Counting</a></h3>
 This technique abuses how some debuggers handle <tt>EXCEPTION_SINGLE_STEP</tt> exceptions.
 
 The idea of this trick is to set hardware breakpoints to each instruction in some predefined sequence (e.g. sequence of <tt>NOP</tt>s). Execution of the instruction with a hardware breakpoint on it raises the <tt>EXCEPTION_SINGLE_STEP</tt> exception which can be caught by a vectored exception handler. In the exception handler, we increment a register which plays the role of instruction counter (<tt>EAX</tt> in our case) and the instruction pointer <tt>EIP</tt> to pass the control to the next instruction in the sequence. Therefore, each time the control is passed to the next instruction in our sequence, the exception is raised and the counter is incremented. After the sequence is finished, we check the counter and if it is not equal to the length of our sequence, we consider it as if the program is being debugged.
@@ -299,7 +331,7 @@ bool IsDebugged()
 <hr class="space">
 
 <br />
-<h3><a class="a-dummy" name="popf_and_trap_flag">6. POPF and Trap Flag</a></h3>
+<h3><a class="a-dummy" name="popf_and_trap_flag">7. POPF and Trap Flag</a></h3>
 This is another trick that can indicate whether a program is being traced.
 
 There is a Trap Flag in the Flags register. When the Trap Flag is set, the exception <tt>SINGLE_STEP</tt> is raised. However, if we traced the code, the Trap Flag will be cleared by a debugger so we won't see the exception.
@@ -337,7 +369,7 @@ bool IsDebugged()
 <hr class="space">
 
 <br />
-<h3><a class="a-dummy" name="instruction_prefixes">7. Instruction Prefixes</a></h3>
+<h3><a class="a-dummy" name="instruction_prefixes">8. Instruction Prefixes</a></h3>
 This trick works only in some debuggers. It abuses the way how these debuggers handle instruction prefixes.
 
 If we execute the following code in OllyDbg, after stepping to the first byte <tt>F3</tt>, we'll immediately get to the end of <tt>try</tt> block. The debugger just skips the prefix and gives the control to the <tt>INT1</tt> instruction.
