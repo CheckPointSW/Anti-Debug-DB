@@ -98,7 +98,7 @@ if (TRUE == CheckRemoteDebuggerPresent(GetCurrentProcess(), &bDebuggerPresent) &
 <p></p>
 
 {% highlight nasm %}
-    lea eax, bDebuggerPresent]
+    lea eax, [bDebuggerPresent]
     push eax
     push -1  ; GetCurrentProcess()
     call CheckRemoteDebuggerPresent
@@ -271,12 +271,12 @@ if (hNtdll)
     lea eax, [dwReturned]
     push eax ; ReturnLength
     push 4   ; ProcessInformationLength
-    lea ecx, [dwProcessDebugPort]
+    lea ecx, [dwProcessDebugFlags]
     push ecx ; ProcessInformation
     push 1Fh ; ProcessInformationClass
     push -1  ; ProcessHandle
     call NtQueryInformationProcess
-    cmp dword ptr [dwProcessDebugPort], 0
+    cmp dword ptr [dwProcessDebugFlags], 0
     jz being_debugged
     ...
 being_debugged:
@@ -293,12 +293,12 @@ being_debugged:
     lea rcx, [dwReturned]
     push rcx     ; ReturnLength
     mov r9d, 4   ; ProcessInformationLength
-    lea r8, [dwProcessDebugPort] 
+    lea r8, [dwProcessDebugFlags] 
                  ; ProcessInformation
     mov edx, 1Fh ; ProcessInformationClass
     mov rcx, -1  ; ProcessHandle
     call NtQueryInformationProcess
-    cmp dword ptr [dwProcessDebugPort], 0
+    cmp dword ptr [dwProcessDebugFlags], 0
     jz being_debugged
     ...
 being_debugged:
@@ -384,7 +384,7 @@ being_debugged:
     mov r9d, 4   ; ProcessInformationLength
     lea r8, [hProcessDebugObject] 
                  ; ProcessInformation
-    mov edx, 1Fh ; ProcessInformationClass
+    mov edx, 1Eh ; ProcessInformationClass
     mov rcx, -1  ; ProcessHandle
     call NtQueryInformationProcess
     cmp dword ptr [hProcessDebugObject], 0
