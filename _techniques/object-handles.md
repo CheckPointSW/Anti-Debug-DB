@@ -21,7 +21,7 @@ tags: object-handles
 <hr class="space">
 
 <h2><a class="a-dummy" name="object-handles">Object Handles</a></h2>
-The following set of techniques represents the checks which use kernel objects handles to detect a debugger presence. Some WinAPI functions that accept kernel object handles as their parameters can behave differently under debugging or cause side-effects that emerge because of debuggers' implementation. Moreover, there are specific kernel objecst that are created by the operation system when debugging begins.
+The following set of techniques represents the checks which use kernel objects handles to detect a debugger presence. Some WinAPI functions that accept kernel object handles as their parameters can behave differently under debugging or cause side-effects that emerge because of debuggers' implementation. Moreover, there are specific kernel objects that are created by the operation system when debugging begins.
 
 <br />
 <h3><a class="a-dummy" name="openprocess">1. OpenProcess()</a></h3>
